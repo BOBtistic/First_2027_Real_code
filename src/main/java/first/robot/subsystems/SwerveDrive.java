@@ -7,6 +7,7 @@ package first.robot.subsystems;
 import org.wpilib.command2.Command;
 import org.wpilib.command2.SubsystemBase;
 import org.wpilib.hardware.bus.CANPort;
+import org.wpilib.math.util.MathUtil;
 
 import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.CANBus;
@@ -15,22 +16,50 @@ import com.revrobotics.spark.SparkAbsoluteEncoder;
 import com.revrobotics.spark.SparkFlex;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 
-
 public class SwerveDrive extends SubsystemBase {
-  /** Creates a new ExampleSubsystem. */
-  public SwerveDrive(int Sid, int Did, int SCid ) {
+  // pulls aligned outside to use in robot container
+  private boolean aligned;
+
+  // Creates a new SwerveDrive.
+  public SwerveDrive(int Sid, int Did, int SCid, boolean aligned) {
+    this.aligned = aligned;
+
+    // Defining motors and encoders
     SparkFlex Steer = new SparkFlex(CANPort.CAN_D0, Sid, MotorType.kBrushless);
     SparkFlex Drive = new SparkFlex(CANPort.CAN_D0, Did, MotorType.kBrushless);
     CANcoder cancoder = new CANcoder(SCid, new CANBus(CANPort.CAN_D0));
     SparkAbsoluteEncoder SpeedEncoder = Drive.getAbsoluteEncoder();
 
-    var Direction = cancoder.getAbsolutePosition();
+    // Getting encoder values
+    var Direction = cancoder.getAbsolutePosition().getValueAsDouble();
     var speed = SpeedEncoder.getVelocity();
 
-    
+    // adding tolerance
+    double error = MathUtil.inputModulus(Direction, -1.0, 1.0);
+
+    // Alighning wheel to face forward on boot
+    if (this.aligned) {
+      if (Math.abs(error) >= 0.01) {
+        if (error > 0) {
+          Steer.setThrottle(-.1);
+        } else if (error < 0) {
+          Steer.setThrottle(.1);
+        } else {
+          Steer.setThrottle(0);
+        }
+      } else {
+        Steer.setThrottle(0);
+        aligned = false;
+      }
+
+    }
+
   }
- 
-  
+
+  public boolean isAligned() {
+    return aligned;
+  }
+
   /**
    * Example command factory method.
    *
@@ -46,7 +75,8 @@ public class SwerveDrive extends SubsystemBase {
   }
 
   /**
-   * An example method querying a boolean state of the subsystem (for example, a digital sensor).
+   * An example method querying a boolean state of the subsystem (for example, a
+   * digital sensor).
    *
    * @return value of some boolean subsystem state, such as a digital sensor.
    */
@@ -57,7 +87,7 @@ public class SwerveDrive extends SubsystemBase {
 
   @Override
   public void periodic() {
-    
+
   }
 
   @Override
