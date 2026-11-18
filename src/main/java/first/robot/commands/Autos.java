@@ -8,13 +8,16 @@ import org.wpilib.command2.Command;
 import org.wpilib.command2.Commands;
 import first.robot.subsystems.SwerveDrive;
 
-public final class Autos {
-  /** Example static factory for an autonomous command. */
-  public static Command exampleAuto(SwerveDrive subsystem) {
-    return Commands.sequence(subsystem.exampleMethodCommand(), new ExampleCommand(subsystem));
-  }
-
-  private Autos() {
-    throw new UnsupportedOperationException("This is a utility class!");
-  }
-}
+/*
+ * public final class Autos {
+ * /** Example static factory for an autonomous command
+ * public static Command exampleAuto(SwerveDrive subsystem) {
+ * return Commands.sequence(subsystem.exampleMethodCommand(), new
+ * ExampleCommand(subsystem));
+ * }
+ * 
+ * private Autos() {
+ * throw new UnsupportedOperationException("This is a utility class!");
+ * }
+ * }
+ */

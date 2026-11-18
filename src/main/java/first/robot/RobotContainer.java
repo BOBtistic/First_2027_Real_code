@@ -4,12 +4,12 @@
 
 package first.robot;
 
-import org.wpilib.command2.Command;
+//import org.wpilib.command2.Command;
 import org.wpilib.command2.button.CommandGamepad;
 import org.wpilib.command2.button.Trigger;
-import first.robot.Constants.OperatorConstants;
-import first.robot.commands.Autos;
-import first.robot.commands.ExampleCommand;
+//import first.robot.Constants.OperatorConstants;
+//import first.robot.commands.Autos;
+//import first.robot.commands.ExampleCommand;
 import first.robot.subsystems.SwerveDrive;
 
 /**
@@ -24,8 +24,9 @@ import first.robot.subsystems.SwerveDrive;
 public class RobotContainer {
   // The robot's subsystems and commands are defined here...
   // private final SwerveDrive exampleSubsystem = new SwerveDrive();
-
-  private final CommandGamepad driverController = new CommandGamepad(OperatorConstants.DRIVER_CONTROLLER_PORT);
+  private final SwerveDrive m_SwerveDrive = new SwerveDrive();
+  // private final CommandGamepad driverController = new
+  // CommandGamepad(OperatorConstants.DRIVER_CONTROLLER_PORT);
 
   /**
    * The container for the robot. Contains subsystems, OI devices, and commands.
@@ -36,6 +37,10 @@ public class RobotContainer {
   }
 
   public void teleopPeriodic() {
+    m_SwerveDrive.SwerveModule(1, 3, true);
+    m_SwerveDrive.SwerveModule(2, 6, true);
+    m_SwerveDrive.SwerveModule(3, 9, true);
+    m_SwerveDrive.SwerveModule(4, 12, true);
 
   }
 

@@ -11,8 +11,8 @@ import org.wpilib.math.util.MathUtil;
 
 import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.CANBus;
-
-import com.revrobotics.spark.SparkAbsoluteEncoder;
+import com.ctre.phoenix6.configs.CANcoderConfiguration;
+//import com.revrobotics.spark.SparkAbsoluteEncoder;
 import com.revrobotics.spark.SparkFlex;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 
@@ -20,19 +20,70 @@ public class SwerveDrive extends SubsystemBase {
   // pulls aligned outside to use in robot container
   private boolean aligned;
 
-  // Creates a new SwerveDrive.
-  public SwerveDrive(int Sid, int Did, int SCid, boolean aligned) {
-    this.aligned = aligned;
+  // Front Left module
+  private final SparkFlex FLSteer = new SparkFlex(CANPort.CAN_D0, 1, MotorType.kBrushless);
+  private final SparkFlex FLDrive = new SparkFlex(CANPort.CAN_D0, 2, MotorType.kBrushless);
+  private final CANcoder FLcoder = new CANcoder(3, new CANBus(CANPort.CAN_D0));
+  CANcoderConfiguration FLcoderConfig = new CANcoderConfiguration();
 
-    // Defining motors and encoders
-    SparkFlex Steer = new SparkFlex(CANPort.CAN_D0, Sid, MotorType.kBrushless);
-    SparkFlex Drive = new SparkFlex(CANPort.CAN_D0, Did, MotorType.kBrushless);
-    CANcoder cancoder = new CANcoder(SCid, new CANBus(CANPort.CAN_D0));
-    SparkAbsoluteEncoder SpeedEncoder = Drive.getAbsoluteEncoder();
+  // Front Right Module
+  private final SparkFlex FRSteer = new SparkFlex(CANPort.CAN_D0, 4, MotorType.kBrushless);
+  private final SparkFlex FRDrive = new SparkFlex(CANPort.CAN_D0, 5, MotorType.kBrushless);
+  private final CANcoder FRcoder = new CANcoder(6, new CANBus(CANPort.CAN_D0));
+  CANcoderConfiguration FRcoderConfig = new CANcoderConfiguration();
+
+  // Back Left Module
+  private final SparkFlex BLSteer = new SparkFlex(CANPort.CAN_D0, 7, MotorType.kBrushless);
+  private final SparkFlex BLDrive = new SparkFlex(CANPort.CAN_D0, 8, MotorType.kBrushless);
+  private final CANcoder BLcoder = new CANcoder(9, new CANBus(CANPort.CAN_D0));
+  CANcoderConfiguration BLcoderConfig = new CANcoderConfiguration();
+
+  // Back Right Module
+  private final SparkFlex BRSteer = new SparkFlex(CANPort.CAN_D0, 10, MotorType.kBrushless);
+  private final SparkFlex BRDrive = new SparkFlex(CANPort.CAN_D0, 11, MotorType.kBrushless);
+  private final CANcoder BRcoder = new CANcoder(12, new CANBus(CANPort.CAN_D0));
+  CANcoderConfiguration BRcoderConfig = new CANcoderConfiguration();
+
+  public void CANCoderconfig() {
+    // Set these when the robot's wheels are facing forward, so that the robot knows
+    // what "forward" is
+    FLcoderConfig.MagnetSensor.MagnetOffset = 0;
+    FLcoder.getConfigurator().apply(FLcoderConfig);
+
+    FRcoderConfig.MagnetSensor.MagnetOffset = 0;
+    FRcoder.getConfigurator().apply(FRcoderConfig);
+
+    BLcoderConfig.MagnetSensor.MagnetOffset = 0;
+    BLcoder.getConfigurator().apply(BLcoderConfig);
+
+    BRcoderConfig.MagnetSensor.MagnetOffset = 0;
+    BRcoder.getConfigurator().apply(BRcoderConfig);
+
+  }
+
+  public void SwerveModule(int Module, int SCid, boolean aligned) {
+    // using the module number to determine which motors to use.
+    SparkFlex Steer = FLSteer;
+    SparkFlex Drive = FLDrive;
+    if (Module == 1) {
+      Steer = FLSteer;
+      Drive = FLDrive;
+    } else if (Module == 2) {
+      Steer = FRSteer;
+      Drive = FRDrive;
+    } else if (Module == 3) {
+      Steer = BLSteer;
+      Drive = BLDrive;
+    } else if (Module == 4) {
+      Steer = BRSteer;
+      Drive = BRDrive;
+    }
+
+    // SparkAbsoluteEncoder SpeedEncoder = Drive.getAbsoluteEncoder();
 
     // Getting encoder values
-    var Direction = cancoder.getAbsolutePosition().getValueAsDouble();
-    var speed = SpeedEncoder.getVelocity();
+    var Direction = FLcoder.getAbsolutePosition().getValueAsDouble();
+    // var speed = SpeedEncoder.getVelocity();
 
     // adding tolerance
     double error = MathUtil.inputModulus(Direction, -1.0, 1.0);
